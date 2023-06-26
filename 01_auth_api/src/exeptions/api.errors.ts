@@ -13,6 +13,10 @@ class ApiError extends Error {
   static UserNotFound(message: string) {
     return new ApiError(404, message);
   }
+
+  static UserUnathorizated(message: string) {
+    return new ApiError(401, message);
+  }
 }
 
 export default ApiError;

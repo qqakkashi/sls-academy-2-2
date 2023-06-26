@@ -20,7 +20,7 @@ class AuthService {
       data: {
         id: insertTokens.rows[0].id,
         access_token: insertTokens.rows[0].access_token,
-        reshresh_token: insertTokens.rows[0].refresh_token,
+        refresh_token: insertTokens.rows[0].refresh_token,
       },
     };
   }
@@ -44,14 +44,31 @@ class AuthService {
       "SELECT id,access_token,refresh_token FROM tokens WHERE id=$1",
       [findUser.rows[0].id]
     );
-    return {
-      success: true,
-      data: {
-        id: findUser.rows[0].id,
-        access_token: tokens.rows[0].access_token,
-        refresh_token: tokens.rows[0].refresh_token,
-      },
-    };
+    const verifyToken = TokenService.verifyToken(tokens.rows[0].access_token);
+    if (!verifyToken) {
+      const newTokens = TokenService.generateTokens(findUser.rows[0].id);
+      const newTokensInsert = await pool.query(
+        "UPDATE tokens SET access_token = $1, refresh_token = $2 WHERE id = $3",
+        [newTokens.access_token, newTokens.refresh_token, findUser.rows[0].id]
+      );
+      return {
+        success: true,
+        data: {
+          id: findUser.rows[0].id,
+          access_token: newTokens.access_token,
+          refresh_token: newTokens.refresh_token,
+        },
+      };
+    } else {
+      return {
+        success: true,
+        data: {
+          id: findUser.rows[0].id,
+          access_token: tokens.rows[0].access_token,
+          refresh_token: tokens.rows[0].refresh_token,
+        },
+      };
+    }
   }
 }
 
