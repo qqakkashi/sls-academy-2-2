@@ -10,5 +10,7 @@ export const ErrorMiddleware = (
   if (err instanceof ApiError) {
     return res.status(err.status).json({ status: false, error: err.message });
   }
-  return res.status(500).json({ message: "Unkown error" });
+  return res
+    .status(500)
+    .json({ status: false, message: "Unknown server error" });
 };
