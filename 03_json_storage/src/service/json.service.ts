@@ -24,6 +24,21 @@ class JsonService {
     });
     return JSON.parse(foramtedJson);
   }
+
+  async getJson(jsonUrl: string) {
+    const findJson = await JsonFilesModel.findAll({
+      attributes: ["json"],
+      where: {
+        url: jsonUrl,
+      },
+    });
+
+    if (findJson.length === 0) {
+      throw ApiError.JsonNotFound(`Json file with url:${jsonUrl} not found`);
+    }
+
+    return JSON.parse(findJson[0].dataValues.json);
+  }
 }
 
 export default new JsonService();

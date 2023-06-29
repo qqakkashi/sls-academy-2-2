@@ -11,6 +11,16 @@ class JsonController {
         return next(ApiError.Conflict("No json file to save"));
       }
       const response = await JsonService.putNewJson(url, file);
+      return res.status(201).json(response);
+    } catch (error: any) {
+      next(error);
+    }
+  }
+
+  async getFile(req: Request, res: Response, next: NextFunction) {
+    try {
+      const url = req.originalUrl;
+      const response = await JsonService.getJson(url);
       return res.status(200).json(response);
     } catch (error: any) {
       next(error);

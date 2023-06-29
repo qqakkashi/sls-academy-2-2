@@ -13,7 +13,7 @@ async function init() {
       console.log(`[server]: Server is running at http://localhost:${port}`);
     });
   } catch (error) {
-    console.error("error occurs with db connections", error);
+    console.error("error occurs with db connection: ", error);
   }
 }
 
