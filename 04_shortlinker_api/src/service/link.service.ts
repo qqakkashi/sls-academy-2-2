@@ -1,6 +1,15 @@
 import { dbConnect } from "../../config/db.config";
+import ApiError from "../exeptions/api.errors";
 
 class LinkService {
+  checkLink(url: string): boolean {
+    try {
+      new URL(url);
+      return true;
+    } catch (error: any) {
+      return false;
+    }
+  }
   async generateLink(): Promise<any> {
     const db = await dbConnect();
     const collection = db!.collection("links");
@@ -25,12 +34,29 @@ class LinkService {
       return findLink.shorted_link;
     }
 
-    const result = await collection.insertOne({
-      full_link: link,
-      shorted_link: shortedLink,
-    });
+    const isLinkReal = this.checkLink(link);
+
+    if (isLinkReal) {
+      const result = await collection.insertOne({
+        full_link: link,
+        shorted_link: shortedLink,
+      });
+    } else {
+      throw ApiError.BadRequest("Provided link isn`t real");
+    }
 
     return shortedLink;
+  }
+
+  async getRedirectLink(shortLink: string): Promise<string> {
+    const db = await dbConnect();
+    const collection = db!.collection("links");
+    const findLink = await collection.findOne({ shorted_link: shortLink });
+    if (findLink !== null) {
+      return findLink.full_link;
+    } else {
+      throw ApiError.LinkNotFound("You need to generate this short link first");
+    }
   }
 }
 

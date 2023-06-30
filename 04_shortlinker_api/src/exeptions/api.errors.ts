@@ -9,6 +9,10 @@ class ApiError extends Error {
   static BadRequest(message: string) {
     return new ApiError(400, message);
   }
+
+  static LinkNotFound(message: string) {
+    return new ApiError(404, message);
+  }
 }
 
 export default ApiError;
